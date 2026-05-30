@@ -137,12 +137,8 @@ tr.ripple-fix {
   font-weight: 600 !important;
 }
 
-/* ── Flat, subtle cards with visible borders ── */
-.v-sheet,
-.v-card {
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
+/* ── Container-level borders only (NOT inner sidebar cards) ── */
+/* Only apply borders to top-level containers, not every inner v-sheet */
 .v-navigation-drawer {
   border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
@@ -150,6 +146,12 @@ tr.ripple-fix {
 .v-toolbar,
 .v-app-bar {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Main content panels (but not sidebar inner cards) */
+.v-main .v-sheet:not([class*="flex-grow"]),
+.v-main .v-card {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ── Remove Material rounded corners ── */
