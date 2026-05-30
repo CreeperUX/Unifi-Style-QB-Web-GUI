@@ -4,13 +4,14 @@ import { Area, AreaChart, ResponsiveContainer } from 'recharts';
 import { getGlobalTransferInfo } from '@/lib/qbit-api';
 import { formatBytes, formatSpeed, formatRatio } from '@/lib/utils';
 import { usePreferencesStore } from '@/stores/preferences';
-import type { GlobalTransferInfo, SyncMainDataResponse, AppPreferences } from '@/types/qbit';
+import type { GlobalTransferInfo, SyncMainDataResponse } from '@/types/qbit';
 
 interface Props {
   transferInfo: GlobalTransferInfo | undefined;
   mainData: SyncMainDataResponse | undefined;
-  preferences: AppPreferences | undefined;
 }
+
+const BUILD = 'v4';
 
 export function StatusSidebar({ transferInfo, mainData }: Props) {
   const ss = mainData?.server_state;
@@ -20,7 +21,6 @@ export function StatusSidebar({ transferInfo, mainData }: Props) {
   const paused = torrents.filter(t => t.state.includes('paused') || t.state.includes('queued')).length;
   const connected = transferInfo?.connection_status === 'connected';
 
-  // Mini throughput history
   const [miniHistory, setMiniHistory] = useState<{ t: number; dl: number; ul: number }[]>([]);
   const interval = usePreferencesStore(s => s.refreshInterval);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
@@ -39,43 +39,60 @@ export function StatusSidebar({ transferInfo, mainData }: Props) {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [interval]);
 
-  return (
-    <aside className="w-[290px] bg-panel-bg border-r border-border-subtle overflow-y-auto flex-shrink-0 p-4 space-y-4">
-      
-      <Section title="Connection">
-        <Row icon={<Globe size={15} />} label="Status">
-          <span className={`text-sm font-semibold ${connected ? 'text-success' : 'text-warning'}`}>
-            {connected ? 'Connected' : 'Firewalled'}
-          </span>
-        </Row>
-        <Row label="DHT Nodes">
-          <span className="text-text-primary font-mono tabular-nums text-sm font-medium">{ss?.dht_nodes ?? '—'}</span>
-        </Row>
-      </Section>
+  const rows = [
+    { icon: <Globe size={16} />, label: 'Status', value: <span className={connected ? 'text-success font-semibold' : 'text-warning font-semibold'}>{connected ? 'Connected' : 'Firewalled'}</span> },
+    { label: 'DHT Nodes', value: <span className="text-text-primary font-mono font-medium">{ss?.dht_nodes ?? '—'}</span> },
+  ];
 
-      <Section title="Throughput">
-        <Row icon={<Download size={15} className="text-success" />} label="Download">
-          <span className="text-success font-mono tabular-nums text-sm font-semibold">
+  return (
+    <aside className="w-[300px] bg-panel-bg border-r border-border flex-shrink-0 overflow-y-auto">
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3 border-b border-border-subtle">
+        <span className="text-xs text-text-tertiary font-mono">Status</span>
+        <span className="text-[10px] text-text-tertiary ml-2 font-mono opacity-50">{BUILD}</span>
+      </div>
+
+      {/* Connection */}
+      <div className="px-5 pt-4 pb-3 border-b border-border-subtle">
+        {rows.map((r, i) => (
+          <div key={i} className="flex items-center justify-between py-1">
+            <span className="flex items-center gap-2.5 text-text-secondary text-sm">
+              {r.icon}{r.label}
+            </span>
+            <span className="text-sm">{r.value}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Throughput */}
+      <div className="px-5 pt-4 pb-3 border-b border-border-subtle">
+        <div className="flex items-center justify-between py-1">
+          <span className="flex items-center gap-2.5 text-text-secondary text-sm">
+            <Download size={16} className="text-success" />Download
+          </span>
+          <span className="text-success font-mono font-semibold text-sm tabular-nums">
             {transferInfo ? formatSpeed(transferInfo.dl_info_speed) : '—'}
           </span>
-        </Row>
-        <Row icon={<Upload size={15} className="text-accent" />} label="Upload">
-          <span className="text-accent font-mono tabular-nums text-sm font-semibold">
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="flex items-center gap-2.5 text-text-secondary text-sm">
+            <Upload size={16} className="text-accent" />Upload
+          </span>
+          <span className="text-accent font-mono font-semibold text-sm tabular-nums">
             {transferInfo ? formatSpeed(transferInfo.up_info_speed) : '—'}
           </span>
-        </Row>
-        {/* Mini throughput sparkline */}
+        </div>
         {miniHistory.length > 2 && (
-          <div className="mt-2 h-[50px]">
+          <div className="mt-2 h-[48px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={miniHistory} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="miniDl" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#33CA5E" stopOpacity={0.3} />
+                    <stop offset="0%" stopColor="#33CA5E" stopOpacity={0.25} />
                     <stop offset="100%" stopColor="#33CA5E" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="miniUl" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#006FFF" stopOpacity={0.3} />
+                    <stop offset="0%" stopColor="#006FFF" stopOpacity={0.25} />
                     <stop offset="100%" stopColor="#006FFF" stopOpacity={0} />
                   </linearGradient>
                 </defs>
@@ -85,84 +102,79 @@ export function StatusSidebar({ transferInfo, mainData }: Props) {
             </ResponsiveContainer>
           </div>
         )}
-      </Section>
+      </div>
 
-      <Section title="Session">
-        <Row label="Downloaded">
+      {/* Session Totals */}
+      <div className="px-5 pt-4 pb-3 border-b border-border-subtle">
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">Downloaded</span>
           <span className="text-text-primary font-mono tabular-nums text-sm">{transferInfo ? formatBytes(transferInfo.dl_info_data) : '—'}</span>
-        </Row>
-        <Row label="Uploaded">
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">Uploaded</span>
           <span className="text-text-primary font-mono tabular-nums text-sm">{transferInfo ? formatBytes(transferInfo.up_info_data) : '—'}</span>
-        </Row>
-        <Row label="Ratio">
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">Ratio</span>
           <span className="text-text-primary font-mono tabular-nums text-sm font-medium">{ss ? formatRatio(parseFloat(ss.global_ratio)) : '—'}</span>
-        </Row>
-      </Section>
+        </div>
+      </div>
 
-      <Section title="Torrents">
-        <Row label="Downloading">
+      {/* Torrents */}
+      <div className="px-5 pt-4 pb-3 border-b border-border-subtle">
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">Downloading</span>
           <span className="text-accent font-mono tabular-nums text-sm font-semibold">{dls}</span>
-        </Row>
-        <Row label="Seeding">
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">Seeding</span>
           <span className="text-success font-mono tabular-nums text-sm font-semibold">{uls}</span>
-        </Row>
-        <Row label="Paused / Queued">
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">Paused / Queued</span>
           <span className="text-text-secondary font-mono tabular-nums text-sm">{paused}</span>
-        </Row>
-        <Row label="Total">
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">Total</span>
           <span className="text-text-primary font-mono tabular-nums text-sm font-bold">{torrents.length}</span>
-        </Row>
-      </Section>
+        </div>
+      </div>
 
-      <Section title="Storage">
-        <Row icon={<HardDrive size={15} />} label="Free">
+      {/* Storage */}
+      <div className="px-5 pt-4 pb-3 border-b border-border-subtle">
+        <div className="flex items-center justify-between py-1">
+          <span className="flex items-center gap-2.5 text-text-secondary text-sm">
+            <HardDrive size={16} />Free
+          </span>
           <span className="text-text-primary font-mono tabular-nums text-sm font-medium">
             {ss?.free_space_on_disk ? formatBytes(ss.free_space_on_disk) : '—'}
           </span>
-        </Row>
-        <Row label="All-time DL">
-          <span className="text-text-secondary font-mono tabular-nums text-xs">{ss ? formatBytes(ss.alltime_dl) : '—'}</span>
-        </Row>
-        <Row label="All-time UL">
-          <span className="text-text-secondary font-mono tabular-nums text-xs">{ss ? formatBytes(ss.alltime_ul) : '—'}</span>
-        </Row>
-      </Section>
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">All-time DL</span>
+          <span className="text-text-tertiary font-mono tabular-nums text-xs">{ss ? formatBytes(ss.alltime_dl) : '—'}</span>
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="text-text-secondary text-sm">All-time UL</span>
+          <span className="text-text-tertiary font-mono tabular-nums text-xs">{ss ? formatBytes(ss.alltime_ul) : '—'}</span>
+        </div>
+      </div>
 
-      <Section title="Health">
-        <Row icon={<Wifi size={15} />} label="Peers">
+      {/* Health */}
+      <div className="px-5 pt-4 pb-5">
+        <div className="flex items-center justify-between py-1">
+          <span className="flex items-center gap-2.5 text-text-secondary text-sm">
+            <Wifi size={16} />Peers
+          </span>
           <span className="text-text-primary font-mono tabular-nums text-sm">{ss?.total_peer_connections ?? '—'}</span>
-        </Row>
-        <Row icon={<Dices size={15} />} label="Queued I/O">
+        </div>
+        <div className="flex items-center justify-between py-1">
+          <span className="flex items-center gap-2.5 text-text-secondary text-sm">
+            <Dices size={16} />Queued I/O
+          </span>
           <span className="text-text-primary font-mono tabular-nums text-sm">{ss?.queued_io_jobs ?? '—'}</span>
-        </Row>
-      </Section>
+        </div>
+      </div>
     </aside>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider mb-3 px-1">
-        {title}
-      </div>
-      <div className="space-y-[2px]">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Row({ icon, label, children }: { icon?: React.ReactNode; label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between px-2 py-1 rounded hover:bg-hover-bg transition-colors">
-      <span className="flex items-center gap-2 text-text-secondary text-[13px] min-w-0 truncate pr-3">
-        {icon}
-        <span className="truncate">{label}</span>
-      </span>
-      <span className="flex-shrink-0 text-right pr-0.5">
-        {children}
-      </span>
-    </div>
   );
 }
