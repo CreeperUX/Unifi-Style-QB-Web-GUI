@@ -1,143 +1,123 @@
-import { Download, HardDrive, Activity, Upload, Share2 } from 'lucide-react';
-import { StatCard } from './StatCard';
-import { SpeedChart } from './SpeedChart';
-import { useMainData, useTransferInfo, useAppPreferences } from '@/hooks/use-qbit';
-import { formatBytes, formatSpeed, formatRatio } from '@/lib/utils';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Area, ComposedChart,
+} from 'recharts';
+import { useEffect, useRef, useState } from 'react';
+import { getGlobalTransferInfo } from '@/lib/qbit-api';
+import { formatSpeed, formatBytes, formatRatio, getStateColor } from '@/lib/utils';
+import { usePreferencesStore } from '@/stores/preferences';
+import type { GlobalTransferInfo, SyncMainDataResponse, AppPreferences } from '@/types/qbit';
 
-export function Dashboard() {
-  const { data: mainData } = useMainData();
-  const { data: transferInfo } = useTransferInfo();
-  const { data: preferences } = useAppPreferences();
+interface Props {
+  transferInfo: GlobalTransferInfo | undefined;
+  mainData: SyncMainDataResponse | undefined;
+  preferences: AppPreferences | undefined;
+}
 
-  const serverState = mainData?.server_state;
+interface SpeedPoint {
+  time: string;
+  dl: number;
+  ul: number;
+}
+
+export function Dashboard({ transferInfo, mainData, preferences }: Props) {
+  const [speedHistory, setSpeedHistory] = useState<SpeedPoint[]>([]);
+  const interval = usePreferencesStore((s) => s.refreshInterval);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
   const torrents = mainData?.torrents ? Object.values(mainData.torrents) : [];
 
-  const activeDownloads = torrents.filter(
-    (t) => t.state === 'downloading' || t.state === 'forcedDL' || t.state === 'metaDL',
-  ).length;
-  const activeUploads = torrents.filter(
-    (t) => t.state === 'uploading' || t.state === 'forcedUP',
-  ).length;
-  const totalTorrents = torrents.length;
-  const freeSpace = serverState?.free_space_on_disk;
+  useEffect(() => {
+    const tick = async () => {
+      try {
+        const info = await getGlobalTransferInfo();
+        const now = new Date();
+        const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        setSpeedHistory(prev => {
+          const next = [...prev, { time, dl: info.dl_info_speed, ul: info.up_info_speed }];
+          return next.length > 90 ? next.slice(-90) : next;
+        });
+      } catch { /* noop */ }
+    };
+    tick();
+    timerRef.current = setInterval(tick, interval);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [interval]);
 
   return (
-    <div className="max-w-[1440px] mx-auto space-y-6">
-      {/* Page header */}
-      <div>
-        <h2 className="text-xl font-semibold text-text">Overview</h2>
-        <p className="text-text-tertiary text-[13px] mt-0.5">Real-time torrent and transfer statistics</p>
-      </div>
-
-      {/* Stat Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Download Speed"
-          value={transferInfo ? formatSpeed(transferInfo.dl_info_speed) : '—'}
-          subValue={transferInfo ? `Total ${formatBytes(transferInfo.dl_info_data)}` : undefined}
-          icon={<Download size={18} />}
-        />
-        <StatCard
-          label="Upload Speed"
-          value={transferInfo ? formatSpeed(transferInfo.up_info_speed) : '—'}
-          subValue={transferInfo ? `Total ${formatBytes(transferInfo.up_info_data)}` : undefined}
-          icon={<Upload size={18} />}
-        />
-        <StatCard
-          label="Active Torrents"
-          value={`${activeDownloads + activeUploads}`}
-          subValue={`${totalTorrents} total · ${activeDownloads} DL / ${activeUploads} UL`}
-          icon={<Activity size={18} />}
-        />
-        <StatCard
-          label="Free Disk Space"
-          value={freeSpace !== undefined ? formatBytes(freeSpace) : '—'}
-          subValue={preferences?.save_path ?? 'Default path'}
-          icon={<HardDrive size={18} />}
-        />
-      </div>
-
-      {/* Second row: chart + more cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Speed Chart - takes 2/3 width */}
-        <div className="lg:col-span-2">
-          <SpeedChart />
+    <div className="space-y-3">
+      {/* ====== Traffic Chart Panel ====== */}
+      <Panel title="Traffic" subtitle="Real-time transfer speed">
+        <div className="h-[220px]">
+          {speedHistory.length === 0 ? (
+            <EmptyState text="Waiting for traffic data..." />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={speedHistory} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="dlFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#14C977" stopOpacity={0.08} />
+                    <stop offset="95%" stopColor="#14C977" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="ulFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#1A6AFF" stopOpacity={0.08} />
+                    <stop offset="95%" stopColor="#1A6AFF" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2630" vertical={false} />
+                <XAxis dataKey="time" stroke="#2B3540" tick={{ fontSize: 10, fill: '#5E6B7A' }} tickLine={false} axisLine={false} interval="preserveStartEnd" minTickGap={50} />
+                <YAxis stroke="#2B3540" tick={{ fontSize: 10, fill: '#5E6B7A' }} tickLine={false} axisLine={false} tickFormatter={(v: number) => formatSpeed(v)} width={68} />
+                <Tooltip
+                  contentStyle={{ background:'#11161C', border:'1px solid #2B3540', borderRadius:'6px', fontSize:'11px', color:'#DEE4EC', padding:'6px 10px' }}
+                  formatter={(v: number, name: string) => [formatSpeed(v), name === 'dl' ? 'Download' : 'Upload']}
+                />
+                <Area type="monotone" dataKey="dl" stroke="#14C977" strokeWidth={1} fill="url(#dlFill)" isAnimationActive={false} dot={false} />
+                <Area type="monotone" dataKey="ul" stroke="#1A6AFF" strokeWidth={1} fill="url(#ulFill)" isAnimationActive={false} dot={false} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          )}
         </div>
-
-        {/* Side stats */}
-        <div className="space-y-4">
-          <StatCard
-            label="Global Ratio"
-            value={serverState ? formatRatio(parseFloat(serverState.global_ratio)) : '—'}
-            subValue={serverState ? `${formatBytes(serverState.alltime_dl)} / ${formatBytes(serverState.alltime_ul)}` : undefined}
-            icon={<Share2 size={18} />}
-          />
-          <StatCard
-            label="DHT Nodes"
-            value={serverState ? String(serverState.dht_nodes) : '—'}
-            subValue="Distributed hash table"
-          />
+        {/* Legend */}
+        <div className="flex items-center gap-4 px-4 pb-3 text-[11px] text-text-tertiary">
+          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green" /> Download</span>
+          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-accent" /> Upload</span>
         </div>
-      </div>
+      </Panel>
 
-      {/* Active Torrents Quick List */}
-      {torrents.length > 0 && (
-        <div className="bg-card border border-border-subtle rounded-lg overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border-subtle flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-text">Active Torrents</h3>
-              <p className="text-text-tertiary text-[12px] mt-0.5">
-                {totalTorrents} torrent{totalTorrents !== 1 ? 's' : ''} total
-              </p>
-            </div>
-          </div>
+      {/* ====== Torrent Table ====== */}
+      <Panel title="Torrents" subtitle={`${torrents.length} total`}>
+        {torrents.length === 0 ? (
+          <EmptyState text="No torrents" />
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
+            <table className="w-full text-[12px]">
               <thead>
-                <tr className="text-text-tertiary text-[11px] uppercase tracking-wider bg-sidebar">
-                  <th className="text-left px-5 py-2.5 font-semibold">Name</th>
-                  <th className="text-right px-4 py-2.5 font-semibold">Size</th>
-                  <th className="text-right px-4 py-2.5 font-semibold">Progress</th>
-                  <th className="text-right px-4 py-2.5 font-semibold">Download</th>
-                  <th className="text-right px-4 py-2.5 font-semibold">Upload</th>
-                  <th className="text-right px-4 py-2.5 font-semibold">Ratio</th>
-                  <th className="text-right px-5 py-2.5 font-semibold">Status</th>
+                <tr className="text-text-tertiary text-[11px] uppercase tracking-wider border-b border-border-subtle">
+                  <th className="text-left px-3 py-2 font-medium">Name</th>
+                  <th className="text-right px-3 py-2 font-medium">Size</th>
+                  <th className="text-right px-3 py-2 font-medium">Progress</th>
+                  <th className="text-right px-3 py-2 font-medium">↓</th>
+                  <th className="text-right px-3 py-2 font-medium">↑</th>
+                  <th className="text-right px-3 py-2 font-medium">Ratio</th>
+                  <th className="text-right px-3 py-2 font-medium">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
-                {torrents.slice(0, 10).map((t) => (
-                  <tr key={t.hash} className="hover:bg-card-hover transition-colors">
-                    <td className="px-5 py-2.5 text-text max-w-72 truncate font-medium" title={t.name}>
-                      {t.name}
-                    </td>
-                    <td className="px-4 py-2.5 text-text-secondary text-right font-mono text-[12px] tabular-nums">
-                      {formatBytes(t.size)}
-                    </td>
-                    <td className="px-4 py-2.5 text-right">
-                      <div className="flex items-center justify-end gap-2.5">
-                        <div className="w-24 h-1.5 bg-input rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              t.progress >= 1 ? 'bg-emerald-400' : 'bg-accent'
-                            }`}
-                            style={{ width: `${Math.min(t.progress * 100, 100)}%` }}
-                          />
+                {torrents.slice(0, 15).map(t => (
+                  <tr key={t.hash} className="hover:bg-hover-bg transition-colors">
+                    <td className="px-3 py-1.5 text-text-primary max-w-64 truncate">{t.name}</td>
+                    <td className="px-3 py-1.5 text-text-secondary text-right font-mono tabular-nums">{formatBytes(t.size)}</td>
+                    <td className="px-3 py-1.5 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="w-16 h-1 bg-input-bg rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${t.progress >= 1 ? 'bg-green' : 'bg-accent'}`} style={{ width: `${t.progress * 100}%` }} />
                         </div>
-                        <span className="text-text-secondary text-[12px] font-mono tabular-nums w-10 text-right">
-                          {(t.progress * 100).toFixed(1)}%
-                        </span>
+                        <span className="text-text-secondary font-mono text-[11px] tabular-nums w-9 text-right">{(t.progress*100).toFixed(0)}%</span>
                       </div>
                     </td>
-                    <td className="px-4 py-2.5 text-right font-mono text-[12px] tabular-nums text-blue-400">
-                      {formatSpeed(t.dlspeed)}
-                    </td>
-                    <td className="px-4 py-2.5 text-right font-mono text-[12px] tabular-nums text-emerald-400">
-                      {formatSpeed(t.upspeed)}
-                    </td>
-                    <td className="px-4 py-2.5 text-right font-mono text-[12px] tabular-nums text-text-secondary">
-                      {formatRatio(t.ratio)}
-                    </td>
-                    <td className="px-5 py-2.5 text-right">
+                    <td className="px-3 py-1.5 text-right font-mono tabular-nums text-[11px]" style={{color: t.dlspeed > 0 ? '#14C977' : '#5E6B7A'}}>{formatSpeed(t.dlspeed)}</td>
+                    <td className="px-3 py-1.5 text-right font-mono tabular-nums text-[11px]" style={{color: t.upspeed > 0 ? '#1A6AFF' : '#5E6B7A'}}>{formatSpeed(t.upspeed)}</td>
+                    <td className="px-3 py-1.5 text-right font-mono tabular-nums text-text-secondary">{formatRatio(t.ratio)}</td>
+                    <td className="px-3 py-1.5 text-right">
                       <StateBadge state={t.state} />
                     </td>
                   </tr>
@@ -145,34 +125,60 @@ export function Dashboard() {
               </tbody>
             </table>
           </div>
+        )}
+      </Panel>
+
+      {/* ====== Bottom Stats Row ====== */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <MiniStat label="Downloaded" value={transferInfo ? formatBytes(transferInfo.dl_info_data) : '—'} color="text-green" />
+        <MiniStat label="Uploaded" value={transferInfo ? formatBytes(transferInfo.up_info_data) : '—'} color="text-accent" />
+        <MiniStat label="Free Disk" value={mainData?.server_state ? formatBytes(mainData.server_state.free_space_on_disk) : '—'} color="text-text-primary" />
+        <MiniStat label="Peers" value={String(mainData?.server_state?.total_peer_connections ?? '—')} color="text-text-primary" />
+      </div>
+    </div>
+  );
+}
+
+/* Panel wrapper */
+function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-panel-bg border border-border-subtle rounded-md overflow-hidden">
+      <div className="px-4 py-2 border-b border-border-subtle flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[13px] font-semibold text-text-primary">{title}</span>
+          {subtitle && <span className="text-[11px] text-text-tertiary">{subtitle}</span>}
         </div>
-      )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="flex items-center justify-center h-[120px] text-text-tertiary text-[12px]">
+      {text}
     </div>
   );
 }
 
 function StateBadge({ state }: { state: string }) {
   let color = 'text-text-tertiary';
-  let bg = 'bg-card';
   let label = state;
-  if (state.includes('downloading') || state.includes('DL') || state === 'metaDL' || state === 'forcedDL') {
-    color = 'text-blue-400'; bg = 'bg-blue-500/10'; label = state === 'metaDL' ? 'Metadata' : 'Downloading';
-  } else if (state.includes('uploading') || state === 'forcedUP') {
-    color = 'text-emerald-400'; bg = 'bg-emerald-400/10'; label = 'Seeding';
-  } else if (state.includes('paused')) {
-    color = 'text-text-tertiary'; label = 'Paused';
-  } else if (state.includes('error') || state.includes('missing')) {
-    color = 'text-danger'; bg = 'bg-red-400/10'; label = 'Error';
-  } else if (state.includes('queued')) {
-    color = 'text-text-secondary'; label = 'Queued';
-  } else if (state.includes('stalled')) {
-    color = 'text-amber-500'; label = 'Stalled';
-  } else if (state.includes('checking') || state.includes('moving') || state.includes('allocating')) {
-    color = 'text-amber-500'; bg = 'bg-amber-500/10'; label = state.charAt(0).toUpperCase() + state.slice(1);
-  }
+  if (state.includes('downloading') || state === 'forcedDL' || state === 'metaDL') { color = 'text-accent'; label = 'DL'; }
+  else if (state.includes('uploading') || state === 'forcedUP') { color = 'text-green'; label = 'UL'; }
+  else if (state.includes('paused')) { label = 'Paused'; }
+  else if (state.includes('queued')) { label = 'Queued'; color = 'text-text-secondary'; }
+  else if (state.includes('error')) { color = 'text-red'; label = 'Error'; }
+  else if (state.includes('stalled')) { color = 'text-yellow'; label = 'Stalled'; }
+  return <span className={`text-[11px] font-medium ${color}`}>{label}</span>;
+}
+
+function MiniStat({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full ${color} ${bg}`}>
-      {label}
-    </span>
+    <div className="bg-panel-bg border border-border-subtle rounded-md px-3 py-2.5">
+      <div className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider mb-1">{label}</div>
+      <div className={`text-[18px] font-bold font-mono tracking-tight tabular-nums ${color}`}>{value}</div>
+    </div>
   );
 }
