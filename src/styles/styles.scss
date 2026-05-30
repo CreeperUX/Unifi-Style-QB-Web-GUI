@@ -110,3 +110,98 @@ tr.ripple-fix {
     }
   }
 }
+
+/* ═══════════════════════════════════════
+   UniFi Design Language Overrides
+   ═══════════════════════════════════════ */
+
+/* Universal: lighter font weight for clean look */
+body,
+.v-application {
+  font-weight: 300 !important;
+  letter-spacing: 0.01em;
+}
+
+/* Headings and labels use medium weight */
+.v-card-title,
+.v-toolbar-title,
+.text-h6,
+.text-subtitle-1,
+.text-subtitle-2 {
+  font-weight: 500 !important;
+}
+
+/* Bold only for critical data */
+.font-weight-bold,
+.text-h5,
+.text-h4 {
+  font-weight: 600 !important;
+}
+
+/* ══ Thin borders on all surface elements ══ */
+.v-sheet,
+.v-card,
+.v-navigation-drawer,
+.v-toolbar,
+.v-app-bar,
+.v-footer {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Subtle border on cards/panels */
+.v-card:not(.v-card--flat) {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Sidebar border */
+.v-navigation-drawer {
+  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Toolbar/app-bar bottom border */
+.v-toolbar,
+.v-app-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ══ UniFi border radius: small & subtle ══ */
+.v-card,
+.v-sheet,
+.v-btn,
+.v-text-field .v-field__outline,
+.v-select .v-field__outline {
+  border-radius: 4px !important;
+}
+
+/* ══ Subtle elevation for depth ══ */
+.v-card--variant-elevated {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2) !important;
+}
+
+/* ══ Cleaner data tables ══ */
+.v-data-table {
+  font-size: 13px;
+}
+.v-data-table .v-data-table__th {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ══ Compact chips ══ */
+.v-chip {
+  font-weight: 400 !important;
+  letter-spacing: 0.02em;
+}
+
+/* ══ Cleaner input fields ══ */
+.v-field {
+  border-radius: 4px !important;
+}
+
+/* ══ Subtle dividers ══ */
+.v-divider {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}

@@ -6,6 +6,23 @@ import themeMap, { DarkUnifi } from '@/themes'
 
 export default createVuetify({
   directives,
+  defaults: {
+    global: {
+      elevation: 0,
+    },
+    VCard: {
+      elevation: 0,
+    },
+    VSheet: {
+      elevation: 0,
+    },
+    VBtn: {
+      variant: 'tonal',
+    },
+    VChip: {
+      variant: 'tonal',
+    },
+  },
   display: {
     mobileBreakpoint: 'sm',
   },
