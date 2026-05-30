@@ -196,3 +196,73 @@ tr.ripple-fix {
 .v-icon {
   opacity: 0.85;
 }
+
+/* ═══════════════════════════════════
+   Sidebar — UniFi status panel style
+   ═══════════════════════════════════ */
+
+/* Remove Vuetify list styling that adds bulky padding */
+.v-navigation-drawer .v-list {
+  background: transparent !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+.v-navigation-drawer .v-list-item {
+  padding-inline: 8px !important;
+  min-height: unset !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+.v-navigation-drawer .v-list-item__overlay {
+  display: none !important;
+}
+
+.v-navigation-drawer .v-list-item__content {
+  overflow: visible !important;
+}
+
+/* Speed cards — compact inline, not chunky tiles */
+.v-navigation-drawer .v-sheet[class*="flex-grow-1"] {
+  min-height: 52px !important;
+  padding: 6px 10px !important;
+}
+
+/* Section headers — clean UniFi labeling */
+.v-navigation-drawer .text-uppercase,
+.v-navigation-drawer [class*="text-uppercase"] {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  margin-bottom: 4px !important;
+}
+
+/* Compact filters section */
+.v-navigation-drawer .v-select .v-field,
+.v-navigation-drawer .v-autocomplete .v-field {
+  min-height: 32px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 12px !important;
+}
+
+.v-navigation-drawer .v-field__input {
+  min-height: 28px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  font-size: 12px !important;
+}
+
+/* Reduce card icon sizes */
+.v-navigation-drawer .v-icon {
+  font-size: 18px !important;
+}
+
+/* Torrent count — subtle bottom label */
+.v-navigation-drawer .v-list-item:last-child {
+  padding-top: 8px !important;
+  font-size: 11px !important;
+  color: rgba(255, 255, 255, 0.35) !important;
+}
