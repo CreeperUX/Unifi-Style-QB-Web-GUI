@@ -7,8 +7,8 @@ export default {
   theme: {
     dark: true,
     colors: Object.assign({}, vars, {
-      // Vuetify base overrides
-      'background': '#080A0D' as string,
+      // ── Core UniFi overrides ──
+      'background': '#080A0D',
       'surface': '#1A1D24',
       'surface-bright': '#20232B',
       'surface-light': '#252830',
@@ -16,19 +16,19 @@ export default {
       'on-surface-variant': '#9DA2B0',
       'primary': '#006FFF',
       'primary-darken-1': '#0056CC',
-      'secondary': '#3DD68C',
-      'secondary-darken-1': '#2FB872',
+      'secondary': '#2D8AFF',
+      'secondary-darken-1': '#2470E0',
+      'accent': '#006FFF' as string,      // ⚠️ Override green from getVariables
       'error': '#F2555A',
       'info': '#2D8AFF',
       'success': '#3DD68C',
       'warning': '#E5A620',
+      // ── Navigation ──
       'navbar': '#0E1015',
-      'download': '#3DD68C',
-      'upload': '#006FFF',
-      'ratio': '#2D8AFF',
-      'category': '#006FFF',
-      'tag': '#0197A8',
-      'tracker': '#E5A620',
+      // ── Custom tokens ──
+      'download': '#006FFF' as string,    // ⚠️ was green, now blue
+      'upload': '#2D8AFF',
+      'ratio': '#0197A8',
       'red': '#F2555A',
     }),
   },

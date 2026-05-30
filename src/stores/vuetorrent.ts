@@ -16,7 +16,7 @@ import {
   TorrentDetailTab,
   TorrentProperty,
 } from '@/constants/vuetorrent'
-import { DarkLegacy, LightLegacy } from '@/themes'
+import { DarkUnifi, LightLegacy } from '@/themes'
 
 export const useVueTorrentStore = defineStore(
   'vuetorrent',
@@ -25,7 +25,7 @@ export const useVueTorrentStore = defineStore(
     const theme = reactive({
       mode: ThemeMode.SYSTEM,
       light: LightLegacy.id,
-      dark: DarkLegacy.id,
+      dark: DarkUnifi.id,
     })
     const showSpeedInTitle = ref(false)
     /** @deprecated */
@@ -308,7 +308,7 @@ export const useVueTorrentStore = defineStore(
         language.value = 'en'
         theme.mode = ThemeMode.SYSTEM
         theme.light = LightLegacy.id
-        theme.dark = DarkLegacy.id
+        theme.dark = DarkUnifi.id
         showSpeedInTitle.value = false
         deleteWithFiles.value = false
         uiTitleType.value = TitleOptions.DEFAULT

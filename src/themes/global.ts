@@ -8,8 +8,8 @@ export const statusColors = {
 export function getVariables(dark: boolean) {
   return {
     // Main colors
-    accent: '#64CEAA',
-    upload: '#00B3FA',
+    accent: '#006FFF',
+    upload: '#2D8AFF',
     ratio: '#00B2F8',
     category: '#04669A',
     tag: '#048B9A',
@@ -41,7 +41,7 @@ export function getVariables(dark: boolean) {
     'torrent-dl_stopped': dark ? grey.base : grey.base,
     'torrent-dl_queued': dark ? blueGrey.darken3 : blueGrey.lighten2,
     'torrent-dl_stalled': dark ? lightGreen.darken1 : green.accent3,
-    'torrent-downloading': dark ? green.darken2 : lightGreen.base,
+    'torrent-downloading': dark ? '#006FFF' : '#2D8AFF',
     'torrent-error': dark ? red.darken4 : red.accent1,
     'torrent-forced_meta_download': dark ? purple.darken4 : purple.lighten4,
     'torrent-meta_download': dark ? purple.darken2 : purple.lighten2,
