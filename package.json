@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=development vite",
-    "build": "NODE_ENV=development vite build",
+    "build": "NODE_ENV=development vite build && node postbuild.cjs",
     "typecheck": "NODE_ENV=development tsc --noEmit",
     "preview": "vite preview",
     "lint": "eslint .",
