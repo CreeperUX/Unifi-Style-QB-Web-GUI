@@ -1,6 +1,6 @@
 import { LayoutDashboard, Download, Search, Rss, Settings } from 'lucide-react';
 
-const navItems = [
+const items = [
   { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { id: 'torrents', icon: Download, label: 'Torrents' },
   { id: 'search', icon: Search, label: 'Search' },
@@ -8,33 +8,26 @@ const navItems = [
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 
-interface Props {
-  active: string;
-  onNavigate: (id: string) => void;
-}
-
-export function IconRail({ active, onNavigate }: Props) {
+export function IconRail({ active, onNavigate }: { active: string; onNavigate: (id: string) => void }) {
   return (
-    <nav className="w-[48px] flex flex-col items-center bg-panel-bg border-r border-border-subtle py-2 gap-1 flex-shrink-0">
-      {/* Logo dot */}
-      <div className="w-8 h-8 rounded-md bg-accent flex items-center justify-center mb-2 mt-1">
-        <span className="text-white font-bold text-[10px]">QB</span>
+    <nav className="w-[52px] flex flex-col items-center bg-panel-bg border-r border-border-subtle py-3 gap-1.5 flex-shrink-0">
+      <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center mb-3 shadow-[0_0_12px_rgba(0,111,255,0.2)]">
+        <span className="text-white font-bold text-[11px] tracking-tight">QB</span>
       </div>
-
-      {navItems.map((item) => {
+      {items.map(item => {
         const isActive = active === item.id;
         return (
           <button
             key={item.id}
             onClick={() => onNavigate(item.id)}
-            className={`w-9 h-9 flex items-center justify-center rounded-md transition-colors ${
+            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
               isActive
                 ? 'text-accent bg-accent-subtle'
                 : 'text-text-tertiary hover:text-text-secondary hover:bg-card-bg'
             }`}
             title={item.label}
           >
-            <item.icon size={18} strokeWidth={isActive ? 2.5 : 1.8} />
+            <item.icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
           </button>
         );
       })}

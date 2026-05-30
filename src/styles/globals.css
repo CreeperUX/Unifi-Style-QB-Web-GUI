@@ -1,50 +1,49 @@
 @import "tailwindcss";
 
-/* ── UniFi Design Tokens (extracted from uniFi OS CSS/JS) ── */
+/* ── UniFi Design System ── */
 :root {
-  --bg-root: #0E0E0E;
-  --bg-panel: #141414;
-  --bg-card: #1A1A1A;
-  --bg-input: #0A0A0A;
-  --bg-hover: #1F1F1F;
-  --border-subtle: #1F1F1F;
-  --border-default: #2A2A2A;
-  --text-primary: #DBDCE1;
-  --text-secondary: #9A9DA8;
-  --text-tertiary: #636873;
+  --bg-root: #0D0D0D;
+  --bg-panel: #18181A;
+  --bg-card: #1E1E21;
+  --bg-input: #121214;
+  --bg-hover: #252528;
+  --border-subtle: #2C2C30;
+  --border-default: #3A3A3F;
+  --text-primary: #D6D7DC;
+  --text-secondary: #9597A1;
+  --text-tertiary: #686B75;
   --accent: #006FFF;
-  --accent-hover: #2095EB;
-  --accent-subtle: rgba(0,111,255,0.1);
-  --success: #39CC64;
-  --warning: #9F6C17;
-  --danger: #D42D06;
+  --accent-hover: #2B8AFF;
+  --accent-subtle: rgba(0,111,255,0.12);
+  --success: #33CA5E;
+  --warning: #D2911E;
+  --danger: #E5483A;
   --purple: #A252E3;
-  --cyan: #01798a;
+  --cyan: #0197A8;
   --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 8px;
 }
 
 @theme inline {
   --color-*: initial;
-  --color-root-bg: #0E0E0E;
-  --color-panel-bg: #141414;
-  --color-card-bg: #1A1A1A;
-  --color-input-bg: #0A0A0A;
-  --color-hover-bg: #1F1F1F;
-  --color-border-subtle: #1F1F1F;
-  --color-border: #2A2A2A;
-  --color-text-primary: #DBDCE1;
-  --color-text-secondary: #9A9DA8;
-  --color-text-tertiary: #636873;
+  --color-root-bg: #0D0D0D;
+  --color-panel-bg: #18181A;
+  --color-card-bg: #1E1E21;
+  --color-input-bg: #121214;
+  --color-hover-bg: #252528;
+  --color-border-subtle: #2C2C30;
+  --color-border: #3A3A3F;
+  --color-text-primary: #D6D7DC;
+  --color-text-secondary: #9597A1;
+  --color-text-tertiary: #686B75;
   --color-accent: #006FFF;
-  --color-accent-hover: #2095EB;
-  --color-accent-subtle: rgba(0,111,255,0.1);
-  --color-success: #39CC64;
-  --color-warning: #9F6C17;
-  --color-danger: #D42D06;
+  --color-accent-hover: #2B8AFF;
+  --color-accent-subtle: rgba(0,111,255,0.12);
+  --color-success: #33CA5E;
+  --color-warning: #D2911E;
+  --color-danger: #E5483A;
   --color-purple: #A252E3;
-  --color-cyan: #01798a;
+  --color-cyan: #0197A8;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -56,14 +55,13 @@ html,body,#root{
   background:var(--bg-root);
   color:var(--text-primary);
   font-family:var(--font-sans);
-  font-size:13px;
-  line-height:1.4;
+  font-size:14px;
+  line-height:1.45;
   font-feature-settings:"liga"0;
 }
 
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border-default);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
 
 *:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-radius:3px}

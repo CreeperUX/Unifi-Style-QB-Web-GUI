@@ -43,7 +43,7 @@ function AppContent({ activePage, onNavigate }: { activePage: string; onNavigate
         />
         {/* Main content */}
         <main className="flex-1 overflow-auto min-w-0">
-          <div className="p-4">
+          <div className="p-5">
             {activePage === 'dashboard' && <Dashboard transferInfo={transferInfo} mainData={mainData} preferences={preferences} />}
             {activePage !== 'dashboard' && <Placeholder title={pageTitles[activePage] ?? activePage} />}
           </div>
