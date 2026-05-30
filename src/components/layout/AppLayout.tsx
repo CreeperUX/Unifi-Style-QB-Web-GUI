@@ -13,7 +13,7 @@ export function AppLayout() {
       <Sidebar active={activePage} onNavigate={setActivePage} />
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar transferInfo={transferInfo} />
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-8">
           {activePage === 'dashboard' && <Dashboard />}
           {activePage === 'torrents' && <PlaceholderPage title="Torrents" />}
           {activePage === 'search' && <PlaceholderPage title="Search" />}
@@ -27,11 +27,11 @@ export function AppLayout() {
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
-    <div className="flex items-center justify-center h-full text-text-tertiary">
+    <div className="flex items-center justify-center h-[60vh] text-text-tertiary">
       <div className="text-center">
-        <div className="text-4xl mb-3">🚧</div>
+        <div className="text-5xl mb-4 opacity-30">🚧</div>
         <p className="text-lg font-medium text-text-secondary">{title}</p>
-        <p className="text-sm mt-1">Coming soon</p>
+        <p className="text-[13px] mt-1 opacity-60">Coming soon</p>
       </div>
     </div>
   );

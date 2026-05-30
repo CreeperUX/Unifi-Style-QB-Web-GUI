@@ -20,36 +20,39 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
 
   return (
     <aside
-      className={`flex flex-col bg-sidebar border-r border-border transition-all duration-200 ${
-        collapsed ? 'w-14' : 'w-52'
+      className={`flex flex-col bg-sidebar border-r border-border-subtle transition-all duration-200 ${
+        collapsed ? 'w-[60px]' : 'w-[240px]'
       }`}
     >
-      {/* Logo */}
-      <div className="flex items-center h-14 px-3 border-b border-border gap-2">
-        <div className="w-8 h-8 rounded-md bg-accent flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-xs">QB</span>
+      {/* Logo area */}
+      <div className="flex items-center h-[56px] px-4 border-b border-border-subtle gap-3 flex-shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center flex-shrink-0 shadow-lg shadow-accent/20">
+          <span className="text-white font-bold text-[13px] tracking-tight">QB</span>
         </div>
         {!collapsed && (
-          <span className="text-text font-semibold text-sm truncate">qBittorrent</span>
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-text font-semibold text-sm leading-tight">qBittorrent</span>
+            <span className="text-text-tertiary text-[11px] leading-tight">UniFi Style</span>
+          </div>
         )}
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 py-2 px-2 space-y-0.5 overflow-y-auto">
+      {/* Nav items */}
+      <nav className="flex-1 py-3 px-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = active === item.id;
           return (
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150 ${
+              className={`w-full flex items-center gap-3 px-3 py-[10px] rounded-lg text-[13px] font-medium transition-all duration-150 ${
                 isActive
-                  ? 'bg-accent-subtle text-accent hover:text-accent-hover'
+                  ? 'bg-accent-subtle text-accent'
                   : 'text-text-secondary hover:text-text hover:bg-card'
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <item.icon size={20} />
+              <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
               {!collapsed && <span className="truncate">{item.label}</span>}
             </button>
           );
@@ -59,7 +62,8 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
       {/* Collapse toggle */}
       <button
         onClick={toggle}
-        className="flex items-center justify-center h-10 border-t border-border text-text-tertiary hover:text-text-secondary hover:bg-card transition-colors"
+        className="flex items-center justify-center h-10 border-t border-border-subtle text-text-tertiary hover:text-text-secondary hover:bg-card transition-colors flex-shrink-0"
+        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
