@@ -1,0 +1,41 @@
+{
+  "name": "unifi-style-qb-webui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development vite",
+    "build": "NODE_ENV=development vite build",
+    "typecheck": "NODE_ENV=development tsc --noEmit",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.0.0",
+    "@tanstack/react-query": "^5.90.0",
+    "@tanstack/react-table": "^8.20.0",
+    "@tanstack/react-virtual": "^3.13.0",
+    "axios": "^1.16.1",
+    "dayjs": "^1.11.21",
+    "lucide-react": "^0.503.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.54.0",
+    "recharts": "^2.15.0",
+    "zod": "^3.25.0",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.4.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.25.0",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.2"
+  }
+}
