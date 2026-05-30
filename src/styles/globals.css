@@ -1,49 +1,44 @@
 @import "tailwindcss";
 
-/* ── UniFi Design System ── */
+/* ── Bold contrast UniFi-style design system ── */
 :root {
-  --bg-root: #0D0D0D;
-  --bg-panel: #18181A;
-  --bg-card: #1E1E21;
-  --bg-input: #121214;
-  --bg-hover: #252528;
-  --border-subtle: #2C2C30;
-  --border-default: #3A3A3F;
-  --text-primary: #D6D7DC;
-  --text-secondary: #9597A1;
-  --text-tertiary: #686B75;
+  --bg-root: #080A0D;
+  --bg-sidebar: #0E1015;
+  --bg-panel: #1A1D24;
+  --bg-card: #20232B;
+  --bg-input: #14161B;
+  --bg-hover: #272B33;
+  --border-subtle: #2D3139;
+  --border-default: #3E434D;
+  --text-primary: #E6E8F0;
+  --text-secondary: #9DA2B0;
+  --text-tertiary: #6F7483;
   --accent: #006FFF;
-  --accent-hover: #2B8AFF;
-  --accent-subtle: rgba(0,111,255,0.12);
-  --success: #33CA5E;
-  --warning: #D2911E;
-  --danger: #E5483A;
-  --purple: #A252E3;
-  --cyan: #0197A8;
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  --accent-hover: #2D8AFF;
+  --success: #3DD68C;
+  --warning: #E5A620;
+  --danger: #F2555A;
+  --shadow-panel: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
 }
 
 @theme inline {
   --color-*: initial;
-  --color-root-bg: #0D0D0D;
-  --color-panel-bg: #18181A;
-  --color-card-bg: #1E1E21;
-  --color-input-bg: #121214;
-  --color-hover-bg: #252528;
-  --color-border-subtle: #2C2C30;
-  --color-border: #3A3A3F;
-  --color-text-primary: #D6D7DC;
-  --color-text-secondary: #9597A1;
-  --color-text-tertiary: #686B75;
+  --color-root-bg: #080A0D;
+  --color-sidebar-bg: #0E1015;
+  --color-panel-bg: #1A1D24;
+  --color-card-bg: #20232B;
+  --color-input-bg: #14161B;
+  --color-hover-bg: #272B33;
+  --color-border-subtle: #2D3139;
+  --color-border: #3E434D;
+  --color-text-primary: #E6E8F0;
+  --color-text-secondary: #9DA2B0;
+  --color-text-tertiary: #6F7483;
   --color-accent: #006FFF;
-  --color-accent-hover: #2B8AFF;
-  --color-accent-subtle: rgba(0,111,255,0.12);
-  --color-success: #33CA5E;
-  --color-warning: #D2911E;
-  --color-danger: #E5483A;
-  --color-purple: #A252E3;
-  --color-cyan: #0197A8;
+  --color-accent-hover: #2D8AFF;
+  --color-success: #3DD68C;
+  --color-warning: #E5A620;
+  --color-danger: #F2555A;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -56,12 +51,9 @@ html,body,#root{
   color:var(--text-primary);
   font-family:var(--font-sans);
   font-size:14px;
-  line-height:1.45;
-  font-feature-settings:"liga"0;
+  line-height:1.5;
 }
 
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border-default);border-radius:3px}
-
-*:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-radius:3px}
